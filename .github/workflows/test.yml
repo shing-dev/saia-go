@@ -30,4 +30,4 @@ jobs:
           args: --timeout 3m0s
 
       - name: Test
-        run: make test
+        run: make setup && make test

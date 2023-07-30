@@ -1,13 +1,16 @@
 .DEFAULT_GOAL := help
 
+export GOBIN := $(PWD)/bin
+# semicolon(;) must be placed at the end of the command to apply the PATH change
+export PATH := $(GOBIN):$(PATH)
+
 .PHONY: setup
 setup: ## Setup tools
-	go install github.com/golang/mock/mockgen
+	./scripts/install-tools.sh
 
 .PHONY: test
 test: ## Run tests
-	@go install gotest.tools/gotestsum@latest
-	gotestsum -- -race -coverprofile=coverage.out ./...
+	@gotestsum -- -race -coverprofile=coverage.out ./...;
 
 .PHONY: cover
 cover: test ## Run tests with showing coverage
@@ -16,11 +19,11 @@ cover: test ## Run tests with showing coverage
 
 .PHONY: lint
 lint: ## Run golangci-lint
-	@golangci-lint run
+	@golangci-lint run;
 
 .PHONY: generate
 generate: ## Run go generate
-	go generate ./...
+	@go generate ./...;
 
 .PHONY: fmt
 fmt: ## Format code

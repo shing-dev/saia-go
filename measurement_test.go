@@ -27,6 +27,7 @@ func Test_measurementAPI_GetMeasurement(t *testing.T) {
 		{
 			name: "Successful response",
 			args: args{ctx: context.Background(), measurementID: 1021366},
+			// TODO: Add more fields to the response
 			resp: `{
   "id": 1021366
 }`,

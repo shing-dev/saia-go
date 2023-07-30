@@ -22,7 +22,7 @@ func newAPIClient(httpClient *http.Client, apiHost string, apiKey string, debug 
 	}
 }
 
-func (a *apiClient) get(req *http.Request, v any) error {
+func (a *apiClient) do(req *http.Request, v any) error {
 	req.Header.Set("Authorization", "APIKey "+a.apiKey)
 	resp, err := a.httpClient.Do(req)
 	if err != nil {

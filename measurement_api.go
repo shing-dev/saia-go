@@ -26,7 +26,7 @@ func (m *measurementAPI) GetMeasurement(ctx context.Context, measurementID int) 
 	}
 
 	var measurement Measurement
-	if err := m.get(req, &measurement); err != nil {
+	if err := m.do(req, &measurement); err != nil {
 		return nil, fmt.Errorf("failed to create request: %w", err)
 	}
 

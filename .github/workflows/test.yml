@@ -1,0 +1,33 @@
+name: Test
+on: [push]
+
+env:
+  GO111MODULE: "on"
+
+jobs:
+  build:
+    name: Build, Test
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Set up Go 1.20
+        uses: actions/setup-go@v4
+        id: setup-go
+        with:
+          go-version-file: "go.mod"
+
+      - name: Download Modules
+        if: ${{ steps.setup-go.outputs.cache-hit != 'true' }}
+        run: go mod download
+
+      - name: Lint
+        uses: golangci/golangci-lint-action@v3
+        with:
+          version: v1.48
+          args: --timeout 3m0s
+
+      - name: Test
+        run: make test

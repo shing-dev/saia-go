@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"net/url"
 )
 
 type apiClient struct {
@@ -38,6 +39,7 @@ func (a *apiClient) do(req *http.Request, v any) error {
 	return nil
 }
 
-func (a *apiClient) buildURL(path string) string {
-	return a.apiHost + path
+func (a *apiClient) buildURL(path string) (*url.URL, error) {
+	u, err := url.Parse(a.apiHost + path)
+	return u, err
 }

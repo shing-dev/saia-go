@@ -2,19 +2,27 @@ package saia
 
 import "time"
 
+type MeasurementStatus string
+
+const (
+	MeasurementStatusPending MeasurementStatus = "pending"
+	MeasurementStatusSuccess MeasurementStatus = "success"
+	MeasurementStatusFailed  MeasurementStatus = "failed"
+)
+
 type Measurement struct {
-	ID                 int       `json:"id"`
-	UUID               string    `json:"uuid"`
-	DeliveryStatus     string    `json:"delivery_status"`
-	NotificationMethod any       `json:"notification_method"`
-	Status             string    `json:"status"`
-	CalculationsCount  int       `json:"calculations_count"`
-	Created            time.Time `json:"created"`
-	Updated            time.Time `json:"updated"`
+	ID                 int               `json:"id"`
+	UUID               string            `json:"uuid"`
+	DeliveryStatus     string            `json:"delivery_status"`
+	NotificationMethod any               `json:"notification_method"`
+	Status             MeasurementStatus `json:"status"`
+	CalculationsCount  int               `json:"calculations_count"`
+	Created            time.Time         `json:"created"`
+	Updated            time.Time         `json:"updated"`
 	State              struct {
 		Email    string `json:"email"`
 		Units    string `json:"units"`
-		Gender   string `json:"gender"`
+		Gender   Gender `json:"gender"`
 		Height   int    `json:"height"`
 		Status   string `json:"status"`
 		Weight   int    `json:"weight"`
@@ -26,17 +34,17 @@ type Measurement struct {
 		Measurements struct {
 			ID      int       `json:"id"`
 			URL     string    `json:"url"`
-			Gender  string    `json:"gender"`
+			Gender  Gender    `json:"gender"`
 			Height  int       `json:"height"`
 			Weight  int       `json:"weight"`
 			Created time.Time `json:"created"`
 			TaskSet struct {
 				IsReady  bool `json:"is_ready"`
 				SubTasks []struct {
-					Name    string `json:"name"`
-					Status  string `json:"status"`
-					Message string `json:"message"`
-					TaskID  string `json:"task_id"`
+					Name    string     `json:"name"`
+					Status  TaskStatus `json:"status"`
+					Message string     `json:"message"`
+					TaskID  string     `json:"task_id"`
 				} `json:"sub_tasks"`
 				IsSuccessful bool `json:"is_successful"`
 			} `json:"task_set"`

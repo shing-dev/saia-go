@@ -2,10 +2,17 @@ package saia
 
 import "time"
 
+type Gender string
+
+const (
+	GenderMale   MeasurementStatus = "male"
+	GenderFemale MeasurementStatus = "female"
+)
+
 type Person struct {
 	ID            int            `json:"id"`
 	URL           string         `json:"url"`
-	Gender        string         `json:"gender"`
+	Gender        Gender         `json:"gender"`
 	Height        int            `json:"height"`
 	Created       time.Time      `json:"created"`
 	Weight        float64        `json:"weight"`
@@ -18,10 +25,10 @@ type Person struct {
 		IsSuccessful bool `json:"is_successful"`
 		IsReady      bool `json:"is_ready"`
 		SubTasks     []struct {
-			Name    string `json:"name"`
-			Status  string `json:"status"`
-			TaskID  string `json:"task_id"`
-			Message string `json:"message"`
+			Name    string     `json:"name"`
+			Status  TaskStatus `json:"status"`
+			TaskID  string     `json:"task_id"`
+			Message string     `json:"message"`
 		} `json:"sub_tasks"`
 	} `json:"task_set"`
 	FrontParams  *FrontParams  `json:"front_params"`

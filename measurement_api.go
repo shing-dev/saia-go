@@ -96,7 +96,7 @@ func (m *measurementAPI) GetMeasurementList(ctx context.Context, options ...GetM
 		opt(params)
 	}
 
-	url, err := m.buildURL(fmt.Sprintf("/measurements/mtm-widgets/"))
+	url, err := m.buildURL("/measurements/mtm-widgets/")
 	if err != nil {
 		return nil, fmt.Errorf("failed to build url: %w", err)
 	}

@@ -30,7 +30,7 @@ func (m *personAPI) GetPerson(ctx context.Context, personID int) (*Person, error
 
 	var person Person
 	if err := m.do(req, &person); err != nil {
-		return nil, fmt.Errorf("failed to create request: %w", err)
+		return nil, fmt.Errorf("failed to make request: %w", err)
 	}
 
 	return &person, nil

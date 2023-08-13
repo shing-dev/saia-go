@@ -4,7 +4,7 @@ package saia
 type Client struct {
 	apiClient *apiClient
 
-	Person         PersonAPI
+	PersonAPI      PersonAPI
 	MeasurementAPI MeasurementAPI
 }
 
@@ -17,7 +17,7 @@ func NewClient(apiKey string, opt ...ClientOption) *Client {
 	apiClient := newAPIClient(opts.HttpClient, opts.APIHost, opts.APIKey, opts.Debug)
 	return &Client{
 		apiClient:      apiClient,
-		Person:         newPersonAPI(apiClient),
+		PersonAPI:      newPersonAPI(apiClient),
 		MeasurementAPI: newMeasurementAPI(apiClient),
 	}
 }

@@ -19,6 +19,7 @@ type PersonAPI interface {
 	CreatePersonWithImages(ctx context.Context, params *CreatePersonWithImagesParams) (*CreatePersonWithImagesResponse, error)
 	StartCalculation(ctx context.Context, personID int) (*StartCalculationResponse, error)
 	GetTaskSet(ctx context.Context, taskSetID string) (*TaskSet, error)
+	// TODO: Add PartialUpdatePerson method to add images after creating a person
 }
 
 type personAPI struct {

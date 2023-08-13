@@ -5,8 +5,8 @@ import "time"
 type Gender string
 
 const (
-	GenderMale   MeasurementStatus = "male"
-	GenderFemale MeasurementStatus = "female"
+	GenderMale   Gender = "male"
+	GenderFemale Gender = "female"
 )
 
 type Person struct {

@@ -8,12 +8,17 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"regexp"
 )
+
+var uuidRegexp = regexp.MustCompile("[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}")
 
 type PersonAPI interface {
 	GetPerson(ctx context.Context, personID int) (*Person, error)
 	CreatePerson(ctx context.Context, params *CreatePersonParams) (*CreatePersonResponse, error)
 	CreatePersonWithImages(ctx context.Context, params *CreatePersonWithImagesParams) (*CreatePersonWithImagesResponse, error)
+	StartCalculation(ctx context.Context, personID int) (*StartCalculationResponse, error)
+	GetTaskSet(ctx context.Context, taskSetID string) (*TaskSet, error)
 }
 
 type personAPI struct {
@@ -27,16 +32,16 @@ func newPersonAPI(apiClient *apiClient) *personAPI {
 func (m *personAPI) GetPerson(ctx context.Context, personID int) (*Person, error) {
 	url, err := m.buildURL(fmt.Sprintf("/persons/%d/", personID))
 	if err != nil {
-		return nil, fmt.Errorf("failed to build url: %w", err)
+		return nil, fmt.Errorf("build url: %w", err)
 	}
 	req, err := http.NewRequestWithContext(ctx, "GET", url.String(), nil)
 	if err != nil {
-		return nil, fmt.Errorf("failed to create request: %w", err)
+		return nil, fmt.Errorf("create request: %w", err)
 	}
 
 	var person Person
 	if err := m.do(req, &person); err != nil {
-		return nil, fmt.Errorf("failed to make request: %w", err)
+		return nil, fmt.Errorf("make request: %w", err)
 	}
 
 	return &person, nil
@@ -115,6 +120,7 @@ func (c *CreatePersonWithImagesParams) toJSON() ([]byte, error) {
 
 type CreatePersonWithImagesResponse struct {
 	TaskSetURL string `json:"task_set_url"`
+	TaskSetID  string `json:"-"`
 }
 
 func (m *personAPI) CreatePersonWithImages(ctx context.Context, params *CreatePersonWithImagesParams) (*CreatePersonWithImagesResponse, error) {
@@ -136,5 +142,52 @@ func (m *personAPI) CreatePersonWithImages(ctx context.Context, params *CreatePe
 		return nil, fmt.Errorf("make request: %w", err)
 	}
 
+	taskSetID := uuidRegexp.FindStringSubmatch(resp.TaskSetURL)[0]
+	resp.TaskSetID = taskSetID
+
 	return &resp, nil
+}
+
+type StartCalculationResponse struct {
+	TaskSetURL string `json:"task_set_url"`
+	TaskSetID  string `json:"-"`
+}
+
+func (m *personAPI) StartCalculation(ctx context.Context, personID int) (*StartCalculationResponse, error) {
+	url, err := m.buildURL(fmt.Sprintf("/persons/%d/calculate/?measurements_type=all", personID))
+	if err != nil {
+		return nil, fmt.Errorf("build url: %w", err)
+	}
+	req, err := http.NewRequestWithContext(ctx, "GET", url.String(), nil)
+	if err != nil {
+		return nil, fmt.Errorf("create request: %w", err)
+	}
+
+	var resp StartCalculationResponse
+	if err := m.do(req, &resp); err != nil {
+		return nil, fmt.Errorf("make request: %w", err)
+	}
+
+	taskSetID := uuidRegexp.FindStringSubmatch(resp.TaskSetURL)[0]
+	resp.TaskSetID = taskSetID
+
+	return &resp, nil
+}
+
+func (m *personAPI) GetTaskSet(ctx context.Context, taskSetID string) (*TaskSet, error) {
+	url, err := m.buildURL(fmt.Sprintf("/queue/%s/", taskSetID))
+	if err != nil {
+		return nil, fmt.Errorf("build url: %w", err)
+	}
+	req, err := http.NewRequestWithContext(ctx, "GET", url.String(), nil)
+	if err != nil {
+		return nil, fmt.Errorf("create request: %w", err)
+	}
+
+	var taskSet TaskSet
+	if err := m.do(req, &taskSet); err != nil {
+		return nil, fmt.Errorf("make request: %w", err)
+	}
+
+	return &taskSet, nil
 }

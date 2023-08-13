@@ -37,3 +37,16 @@ type Person struct {
 	IsViewed     bool          `json:"is_viewed"`
 	IsArchived   bool          `json:"is_archived"`
 }
+
+type TaskSet struct {
+	IsSuccessful bool       `json:"is_successful"`
+	IsReady      bool       `json:"is_ready"`
+	SubTasks     []*SubTask `json:"sub_tasks"`
+}
+
+type SubTask struct {
+	Name    string `json:"name"`
+	Status  string `json:"status"`
+	TaskID  string `json:"task_id"`
+	Message string `json:"message"`
+}

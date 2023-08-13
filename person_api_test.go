@@ -184,6 +184,7 @@ func Test_personAPI_CreatePersonWithImages(t *testing.T) {
 }`,
 			want: &CreatePersonWithImagesResponse{
 				TaskSetURL: "https://saia.3dlook.me/api/v2/queue/4d563d3f-38ae-4b51-8eab-2b78483b153e/",
+				TaskSetID:  "4d563d3f-38ae-4b51-8eab-2b78483b153e",
 			},
 		},
 		{
@@ -221,6 +222,70 @@ func Test_personAPI_CreatePersonWithImages(t *testing.T) {
 			}
 			if diff := cmp.Diff(got, tt.want); diff != "" {
 				t.Errorf("CreatePerson() (-got, +want)\n%s", diff)
+			}
+		})
+	}
+}
+
+func Test_personAPI_StartCalculation(t *testing.T) {
+	t.Parallel()
+
+	type args struct {
+		ctx      context.Context
+		personID int
+	}
+	tests := []struct {
+		name           string
+		args           args
+		resp           string
+		respStatusCode int
+		want           *StartCalculationResponse
+		wantErr        bool
+	}{
+		{
+			name: "Successful response",
+			args: args{ctx: context.Background(), personID: 1021366},
+			// TODO: Add more fields to the response
+			resp: `{
+	"task_set_url": "https://saia.3dlook.me/api/v2/queue/4d563d3f-38ae-4b51-8eab-2b78483b153e/"
+}`,
+			want: &StartCalculationResponse{
+				TaskSetURL: "https://saia.3dlook.me/api/v2/queue/4d563d3f-38ae-4b51-8eab-2b78483b153e/",
+				TaskSetID:  "4d563d3f-38ae-4b51-8eab-2b78483b153e",
+			},
+		},
+		{
+			name:           "Error response",
+			args:           args{ctx: context.Background(), personID: 0000},
+			resp:           `{"error": "invalid api key"}`,
+			respStatusCode: 409,
+			wantErr:        true,
+		},
+		{
+			name:    "Invalid json response",
+			args:    args{ctx: context.Background(), personID: 0000},
+			resp:    "{",
+			wantErr: true,
+		},
+	}
+	for _, tt := range tests {
+		tt := tt
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
+			statusCode := 200
+			if tt.respStatusCode > 0 {
+				statusCode = tt.respStatusCode
+			}
+			m := mockPersonAPI(t, tt.resp, statusCode)
+
+			got, err := m.StartCalculation(tt.args.ctx, tt.args.personID)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("StartCalculation() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if diff := cmp.Diff(got, tt.want); diff != "" {
+				t.Errorf("StartCalculation() (-got, +want)\n%s", diff)
 			}
 		})
 	}

@@ -93,14 +93,13 @@ func Test_personAPI_CreatePerson(t *testing.T) {
 			args: args{
 				ctx: context.Background(),
 				params: &CreatePersonParams{
-					Gender:     GenderFemale,
-					Height:     170,
-					Weight:     70.1,
-					FrontImage: bytes.NewReader([]byte("dummy front image")),
-					SideImage:  bytes.NewReader([]byte("dummy side image")),
+					Gender: GenderFemale,
+					Height: 170,
+					Weight: 70.1,
 				},
 			},
-			resp: `{
+			resp: `
+{
     "id": 3,
     "url": "https://saia.3dlook.me/api/v2/persons/3/?measurements_type=all",
     "gender": "female",
@@ -120,6 +119,78 @@ func Test_personAPI_CreatePerson(t *testing.T) {
 			args: args{
 				ctx: context.Background(),
 				params: &CreatePersonParams{
+					Gender: GenderFemale,
+					Height: 120,
+					Weight: 70.1,
+				},
+			},
+			resp:           `{"height":["This field must be an number between 150 and 230."]}`,
+			respStatusCode: 400,
+			wantErr:        true,
+		},
+	}
+	for _, tt := range tests {
+		tt := tt
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
+			statusCode := 200
+			if tt.respStatusCode > 0 {
+				statusCode = tt.respStatusCode
+			}
+			m := mockPersonAPI(t, tt.resp, statusCode)
+
+			got, err := m.CreatePerson(tt.args.ctx, tt.args.params)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("CreatePerson() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if diff := cmp.Diff(got, tt.want); diff != "" {
+				t.Errorf("CreatePerson() (-got, +want)\n%s", diff)
+			}
+		})
+	}
+}
+
+func Test_personAPI_CreatePersonWithImages(t *testing.T) {
+	t.Parallel()
+
+	type args struct {
+		ctx    context.Context
+		params *CreatePersonWithImagesParams
+	}
+	tests := []struct {
+		name           string
+		args           args
+		resp           string
+		respStatusCode int
+		want           *CreatePersonWithImagesResponse
+		wantErr        bool
+	}{
+		{
+			name: "Successful response",
+			args: args{
+				ctx: context.Background(),
+				params: &CreatePersonWithImagesParams{
+					Gender:     GenderFemale,
+					Height:     170,
+					Weight:     70.1,
+					FrontImage: bytes.NewReader([]byte("dummy front image")),
+					SideImage:  bytes.NewReader([]byte("dummy side image")),
+				},
+			},
+			resp: `{
+	"task_set_url": "https://saia.3dlook.me/api/v2/queue/4d563d3f-38ae-4b51-8eab-2b78483b153e/"
+}`,
+			want: &CreatePersonWithImagesResponse{
+				TaskSetURL: "https://saia.3dlook.me/api/v2/queue/4d563d3f-38ae-4b51-8eab-2b78483b153e/",
+			},
+		},
+		{
+			name: "Error response",
+			args: args{
+				ctx: context.Background(),
+				params: &CreatePersonWithImagesParams{
 					Gender:     GenderFemale,
 					Height:     120,
 					Weight:     70.1,
@@ -143,7 +214,7 @@ func Test_personAPI_CreatePerson(t *testing.T) {
 			}
 			m := mockPersonAPI(t, tt.resp, statusCode)
 
-			got, err := m.CreatePerson(tt.args.ctx, tt.args.params)
+			got, err := m.CreatePersonWithImages(tt.args.ctx, tt.args.params)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("CreatePerson() error = %v, wantErr %v", err, tt.wantErr)
 				return

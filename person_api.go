@@ -18,7 +18,7 @@ type PersonAPI interface {
 	CreatePerson(ctx context.Context, params *CreatePersonParams) (*CreatePersonResponse, error)
 	CreatePersonWithImages(ctx context.Context, params *CreatePersonWithImagesParams) (*CreatePersonWithImagesResponse, error)
 	StartCalculation(ctx context.Context, personID int) (*StartCalculationResponse, error)
-	GetTaskSet(ctx context.Context, taskSetID string) (*TaskSet, error)
+	GetTaskSet(ctx context.Context, taskSetID string) (*GetTaskSetResponse, error)
 	// TODO: Add PartialUpdatePerson method to add images after creating a person
 }
 
@@ -41,7 +41,7 @@ func (m *personAPI) GetPerson(ctx context.Context, personID int) (*Person, error
 	}
 
 	var person Person
-	if err := m.do(req, &person); err != nil {
+	if err := m.request(req, &person); err != nil {
 		return nil, fmt.Errorf("make request: %w", err)
 	}
 
@@ -74,13 +74,13 @@ func (m *personAPI) CreatePerson(ctx context.Context, params *CreatePersonParams
 	if err != nil {
 		return nil, fmt.Errorf("marshal params to json: %w", err)
 	}
-	req, err := http.NewRequestWithContext(ctx, "GET", url.String(), bytes.NewReader(reqBody))
+	req, err := http.NewRequestWithContext(ctx, "POST", url.String(), bytes.NewReader(reqBody))
 	if err != nil {
 		return nil, fmt.Errorf("create request: %w", err)
 	}
 
 	var resp CreatePersonResponse
-	if err := m.do(req, &resp); err != nil {
+	if err := m.request(req, &resp); err != nil {
 		return nil, fmt.Errorf("make request: %w", err)
 	}
 
@@ -111,11 +111,11 @@ func (c *CreatePersonWithImagesParams) toJSON() ([]byte, error) {
 	}
 
 	return json.Marshal(map[string]any{
-		"gender":     c.Gender,
-		"height":     c.Height,
-		"weight":     c.Weight,
-		"frontImage": base64.StdEncoding.EncodeToString(frontImageBytes),
-		"sideImage":  base64.StdEncoding.EncodeToString(sideImageBytes),
+		"gender":      c.Gender,
+		"height":      c.Height,
+		"weight":      c.Weight,
+		"front_image": base64.StdEncoding.EncodeToString(frontImageBytes),
+		"side_image":  base64.StdEncoding.EncodeToString(sideImageBytes),
 	})
 }
 
@@ -133,13 +133,13 @@ func (m *personAPI) CreatePersonWithImages(ctx context.Context, params *CreatePe
 	if err != nil {
 		return nil, fmt.Errorf("convert params to json: %w", err)
 	}
-	req, err := http.NewRequestWithContext(ctx, "GET", url.String(), bytes.NewReader(reqBody))
+	req, err := http.NewRequestWithContext(ctx, "POST", url.String(), bytes.NewReader(reqBody))
 	if err != nil {
 		return nil, fmt.Errorf("create request: %w", err)
 	}
 
 	var resp CreatePersonWithImagesResponse
-	if err := m.do(req, &resp); err != nil {
+	if err := m.request(req, &resp); err != nil {
 		return nil, fmt.Errorf("make request: %w", err)
 	}
 
@@ -165,7 +165,7 @@ func (m *personAPI) StartCalculation(ctx context.Context, personID int) (*StartC
 	}
 
 	var resp StartCalculationResponse
-	if err := m.do(req, &resp); err != nil {
+	if err := m.request(req, &resp); err != nil {
 		return nil, fmt.Errorf("make request: %w", err)
 	}
 
@@ -175,7 +175,15 @@ func (m *personAPI) StartCalculation(ctx context.Context, personID int) (*StartC
 	return &resp, nil
 }
 
-func (m *personAPI) GetTaskSet(ctx context.Context, taskSetID string) (*TaskSet, error) {
+// GetTaskSetResponse is the response of task set endpoint
+// It returns taskSet when task is not finished or failed
+// It returns measured person when it's successful
+type GetTaskSetResponse struct {
+	TaskSet *TaskSet
+	Person  *Person
+}
+
+func (m *personAPI) GetTaskSet(ctx context.Context, taskSetID string) (*GetTaskSetResponse, error) {
 	url, err := m.buildURL(fmt.Sprintf("/queue/%s/", taskSetID))
 	if err != nil {
 		return nil, fmt.Errorf("build url: %w", err)
@@ -185,10 +193,38 @@ func (m *personAPI) GetTaskSet(ctx context.Context, taskSetID string) (*TaskSet,
 		return nil, fmt.Errorf("create request: %w", err)
 	}
 
-	var taskSet TaskSet
-	if err := m.do(req, &taskSet); err != nil {
+	resp, err := m.do(req)
+	if err != nil {
 		return nil, fmt.Errorf("make request: %w", err)
 	}
+	if resp.StatusCode >= 500 {
+		bodyBytes, err := io.ReadAll(resp.Body)
+		if err == nil {
+			return nil, fmt.Errorf("failed to send request status: %s, body: %s", resp.Status, string(bodyBytes))
+		}
+		return nil, fmt.Errorf("failed to send request: %s", resp.Status)
+	}
 
-	return &taskSet, nil
+	respBody := map[string]interface{}{}
+	if err := json.NewDecoder(resp.Body).Decode(&respBody); err != nil {
+		return nil, fmt.Errorf("failed to decode response body: %w", err)
+	}
+	respJSON, err := json.Marshal(respBody)
+	if err != nil {
+		return nil, err
+	}
+
+	if respBody["is_ready"] != nil {
+		var taskSet TaskSet
+		if err := json.Unmarshal(respJSON, &taskSet); err != nil {
+			return nil, err
+		}
+		return &GetTaskSetResponse{TaskSet: &taskSet}, nil
+	} else {
+		var person Person
+		if err := json.Unmarshal(respJSON, &person); err != nil {
+			return nil, err
+		}
+		return &GetTaskSetResponse{Person: &person}, nil
+	}
 }

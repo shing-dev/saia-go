@@ -3,6 +3,7 @@ package saia
 import (
 	"encoding/json"
 	"fmt"
+	"io"
 	"net/http"
 	"net/url"
 )
@@ -23,13 +24,16 @@ func newAPIClient(httpClient *http.Client, apiHost string, apiKey string, debug 
 	}
 }
 
-func (a *apiClient) do(req *http.Request, v any) error {
-	req.Header.Set("Authorization", "APIKey "+a.apiKey)
-	resp, err := a.httpClient.Do(req)
+func (a *apiClient) request(req *http.Request, v any) error {
+	resp, err := a.do(req)
 	if err != nil {
 		return fmt.Errorf("failed to send request: %w", err)
 	}
 	if resp.StatusCode >= 400 {
+		bodyBytes, err := io.ReadAll(resp.Body)
+		if err == nil {
+			return fmt.Errorf("failed to send request status: %s, body: %s", resp.Status, string(bodyBytes))
+		}
 		return fmt.Errorf("failed to send request: %s", resp.Status)
 	}
 
@@ -37,6 +41,13 @@ func (a *apiClient) do(req *http.Request, v any) error {
 		return fmt.Errorf("failed to decode response body: %w", err)
 	}
 	return nil
+}
+
+func (a *apiClient) do(req *http.Request) (*http.Response, error) {
+	req.Header.Set("Authorization", "APIKey "+a.apiKey)
+	req.Header.Set("Content-Type", "application/json")
+	resp, err := a.httpClient.Do(req)
+	return resp, err
 }
 
 func (a *apiClient) buildURL(path string) (*url.URL, error) {

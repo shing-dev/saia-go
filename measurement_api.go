@@ -107,7 +107,7 @@ func (m *measurementAPI) GetMeasurementList(ctx context.Context, options ...GetM
 	}
 
 	var resp GetMeasurementListResponse
-	if err := m.do(req, &resp); err != nil {
+	if err := m.request(req, &resp); err != nil {
 		return nil, fmt.Errorf("failed to make request: %w", err)
 	}
 
@@ -125,7 +125,7 @@ func (m *measurementAPI) GetMeasurement(ctx context.Context, measurementID int) 
 	}
 
 	var measurement Measurement
-	if err := m.do(req, &measurement); err != nil {
+	if err := m.request(req, &measurement); err != nil {
 		return nil, fmt.Errorf("failed to make request: %w", err)
 	}
 

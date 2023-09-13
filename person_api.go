@@ -48,13 +48,33 @@ func (m *personAPI) GetPerson(ctx context.Context, personID int) (*Person, error
 	return &person, nil
 }
 
+type PhotoFlowType string
+
+const (
+	PhotoFlowTypeFriend PhotoFlowType = "friend"
+	PhotoFlowTypeHand   PhotoFlowType = "hand"
+)
+
+type DeviceCoordinates struct {
+	FrontPhoto *DeviceCoordinate `json:"front_photo"`
+	SidePhoto  *DeviceCoordinate `json:"side_photo"`
+}
+
+type DeviceCoordinate struct {
+	BetaX  int `json:"betaX"`
+	GammaY int `json:"gammaY"`
+	AlphaZ int `json:"alphaZ"`
+}
+
 type CreatePersonParams struct {
 	// Gender of person, male or female
 	Gender Gender `json:"gender"`
 	// Height of person, in cm
 	Height int `json:"height"`
 	// Weight of person, in kg
-	Weight float64 `json:"weight"`
+	Weight            float64            `json:"weight"`
+	DeviceCoordinates *DeviceCoordinates `json:"deviceCoordinates"`
+	PhotoFlowType     PhotoFlowType      `json:"photoFlowType"`
 }
 
 type CreatePersonResponse struct {

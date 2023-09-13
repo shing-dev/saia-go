@@ -72,9 +72,7 @@ type CreatePersonParams struct {
 	// Height of person, in cm
 	Height int `json:"height"`
 	// Weight of person, in kg
-	Weight            float64            `json:"weight"`
-	DeviceCoordinates *DeviceCoordinates `json:"deviceCoordinates"`
-	PhotoFlowType     PhotoFlowType      `json:"photoFlowType"`
+	Weight float64 `json:"weight"`
 }
 
 type CreatePersonResponse struct {
@@ -117,7 +115,9 @@ type CreatePersonWithImagesParams struct {
 	// FrontImage is front image file
 	FrontImage io.Reader
 	// SideImage is side image file
-	SideImage io.Reader
+	SideImage         io.Reader
+	DeviceCoordinates *DeviceCoordinates `json:"deviceCoordinates"`
+	PhotoFlowType     PhotoFlowType      `json:"photoFlowType"`
 }
 
 func (c *CreatePersonWithImagesParams) toJSON() ([]byte, error) {
@@ -131,11 +131,13 @@ func (c *CreatePersonWithImagesParams) toJSON() ([]byte, error) {
 	}
 
 	return json.Marshal(map[string]any{
-		"gender":      c.Gender,
-		"height":      c.Height,
-		"weight":      c.Weight,
-		"front_image": base64.StdEncoding.EncodeToString(frontImageBytes),
-		"side_image":  base64.StdEncoding.EncodeToString(sideImageBytes),
+		"gender":         c.Gender,
+		"height":         c.Height,
+		"weight":         c.Weight,
+		"front_image":    base64.StdEncoding.EncodeToString(frontImageBytes),
+		"side_image":     base64.StdEncoding.EncodeToString(sideImageBytes),
+		"phone_position": c.DeviceCoordinates,
+		"photo_flow":     c.PhotoFlowType,
 	})
 }
 

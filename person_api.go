@@ -56,8 +56,8 @@ const (
 )
 
 type DeviceCoordinates struct {
-	FrontPhoto *DeviceCoordinate `json:"front_photo"`
-	SidePhoto  *DeviceCoordinate `json:"side_photo"`
+	FrontPhoto *DeviceCoordinate `json:"frontPhoto"`
+	SidePhoto  *DeviceCoordinate `json:"sidePhoto"`
 }
 
 type DeviceCoordinate struct {
@@ -116,8 +116,8 @@ type CreatePersonWithImagesParams struct {
 	FrontImage io.Reader
 	// SideImage is side image file
 	SideImage         io.Reader
-	DeviceCoordinates *DeviceCoordinates `json:"deviceCoordinates"`
-	PhotoFlowType     PhotoFlowType      `json:"photoFlowType"`
+	DeviceCoordinates *DeviceCoordinates
+	PhotoFlowType     PhotoFlowType
 }
 
 func (c *CreatePersonWithImagesParams) toJSON() ([]byte, error) {

@@ -72,6 +72,7 @@ const (
 	SubTaskErrorCodeObjectIsNotHuman
 	SubTaskErrorCodeSidePhotoInTheFront
 	SubTaskErrorCodeFrontPhotoInTheSide
+	SubTaskErrorCodeDetermineLookingSideFailed
 	SubTaskErrorCodeBodyIsNotFull
 )
 
@@ -103,6 +104,8 @@ func (s *SubTask) ErrorCode() SubTaskErrorCode {
 		return SubTaskErrorCodeFrontPhotoInTheSide
 	case s.Message == "The body is not full":
 		return SubTaskErrorCodeBodyIsNotFull
+	case s.Message == "Failed to determine looking side":
+		return SubTaskErrorCodeDetermineLookingSideFailed
 	default:
 		return SubTaskErrorCodeUnknown
 	}

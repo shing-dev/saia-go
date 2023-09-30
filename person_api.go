@@ -61,9 +61,9 @@ type DeviceCoordinates struct {
 }
 
 type DeviceCoordinate struct {
-	BetaX  int `json:"betaX"`
-	GammaY int `json:"gammaY"`
-	AlphaZ int `json:"alphaZ"`
+	BetaX  float64 `json:"betaX"`
+	GammaY float64 `json:"gammaY"`
+	AlphaZ float64 `json:"alphaZ"`
 }
 
 type CreatePersonParams struct {

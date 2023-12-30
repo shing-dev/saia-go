@@ -94,7 +94,7 @@ func (s *SubTask) ErrorCode() SubTaskErrorCode {
 	switch {
 	case strings.HasPrefix(s.Message, "The pose is wrong"):
 		return SubTaskErrorCodeWrongPose
-	case s.Message == "Can't detect the human body":
+	case s.Message == "Can't detect the human body" || s.Message == "We cannot find a person in the photo":
 		return SubTaskErrorCodeHumanBodyNotDetected
 	case s.Message == "The detected object is not human":
 		return SubTaskErrorCodeObjectIsNotHuman

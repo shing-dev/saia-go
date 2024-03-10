@@ -6,7 +6,6 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
-	"github.com/k0kubun/pp"
 	"io"
 	"net/http"
 	"regexp"
@@ -244,7 +243,6 @@ func (m *personAPI) GetTaskSet(ctx context.Context, taskSetID string) (*GetTaskS
 		}
 		return &GetTaskSetResponse{TaskSet: &taskSet}, nil
 	} else {
-		pp.Println(respBody)
 		var person Person
 		if err := json.Unmarshal(respJSON, &person); err != nil {
 			return nil, err

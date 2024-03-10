@@ -54,13 +54,13 @@ type Measurement struct {
 			IsArchived bool   `json:"is_archived"`
 			SideParams struct {
 				ClothesType struct {
-					Types []any `json:"types"`
+					Types string `json:"types"`
 				} `json:"clothes_type"`
 				NeckToChest    float64 `json:"neck_to_chest"`
 				ChestToWaist   float64 `json:"chest_to_waist"`
 				WaistToAnkle   float64 `json:"waist_to_ankle"`
 				SoftValidation struct {
-					Messages []any `json:"messages"`
+					Messages string `json:"messages"`
 				} `json:"soft_validation"`
 				ShouldersToKnees        float64 `json:"shoulders_to_knees"`
 				SideNeckPointToUpperHip float64 `json:"side_neck_point_to_upper_hip"`
@@ -83,16 +83,7 @@ type Measurement struct {
 				KneeHeight  float64 `json:"knee_height"`
 				NeckLength  float64 `json:"neck_length"`
 				ClothesType struct {
-					Types struct {
-						Top struct {
-							Code   string `json:"code"`
-							Detail string `json:"detail"`
-						} `json:"top"`
-						Bottom struct {
-							Code   string `json:"code"`
-							Detail string `json:"detail"`
-						} `json:"bottom"`
-					} `json:"types"`
+					Types string `json:"types"`
 				} `json:"clothes_type"`
 				TorsoHeight    float64 `json:"torso_height"`
 				WaistHeight    float64 `json:"waist_height"`
@@ -103,7 +94,7 @@ type Measurement struct {
 				WaistToKnees   float64 `json:"waist_to_knees"`
 				ShoulderLength float64 `json:"shoulder_length"`
 				SoftValidation struct {
-					Messages []any `json:"messages"`
+					Messages string `json:"messages"`
 				} `json:"soft_validation"`
 				UnderarmLength                         float64 `json:"underarm_length"`
 				BackNeckHeight                         float64 `json:"back_neck_height"`
@@ -256,20 +247,8 @@ type PhonePosition struct {
 
 type FrontParams struct {
 	SoftValidation struct {
-		Messages []any `json:"messages"`
+		Messages string `json:"messages"`
 	} `json:"soft_validation"`
-	ClothesType struct {
-		Types struct {
-			Top struct {
-				Code   string `json:"code"`
-				Detail string `json:"detail"`
-			} `json:"top"`
-			Bottom struct {
-				Code   string `json:"code"`
-				Detail string `json:"detail"`
-			} `json:"bottom"`
-		} `json:"types"`
-	} `json:"clothes_type"`
 	BodyAreaPercentage                     float64 `json:"body_area_percentage"`
 	BodyHeight                             float64 `json:"body_height"`
 	Outseam                                float64 `json:"outseam"`
@@ -327,11 +306,8 @@ type FrontParams struct {
 
 type SideParams struct {
 	SoftValidation struct {
-		Messages []any `json:"messages"`
+		Messages string `json:"messages"`
 	} `json:"soft_validation"`
-	ClothesType struct {
-		Types []any `json:"types"`
-	} `json:"clothes_type"`
 	BodyAreaPercentage      float64 `json:"body_area_percentage"`
 	SideUpperHipLevelToKnee float64 `json:"side_upper_hip_level_to_knee"`
 	SideNeckPointToUpperHip float64 `json:"side_neck_point_to_upper_hip"`

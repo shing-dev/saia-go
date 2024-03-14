@@ -1,6 +1,9 @@
 package saia
 
-import "time"
+import (
+	"encoding/json"
+	"time"
+)
 
 type MeasurementStatus string
 
@@ -60,7 +63,8 @@ type Measurement struct {
 				ChestToWaist   float64 `json:"chest_to_waist"`
 				WaistToAnkle   float64 `json:"waist_to_ankle"`
 				SoftValidation struct {
-					Messages string `json:"messages"`
+					// FIXME: Messages can be struct or string
+					Messages json.RawMessage `json:"messages"`
 				} `json:"soft_validation"`
 				ShouldersToKnees        float64 `json:"shoulders_to_knees"`
 				SideNeckPointToUpperHip float64 `json:"side_neck_point_to_upper_hip"`
@@ -94,7 +98,7 @@ type Measurement struct {
 				WaistToKnees   float64 `json:"waist_to_knees"`
 				ShoulderLength float64 `json:"shoulder_length"`
 				SoftValidation struct {
-					Messages string `json:"messages"`
+					Messages json.RawMessage `json:"messages"`
 				} `json:"soft_validation"`
 				UnderarmLength                         float64 `json:"underarm_length"`
 				BackNeckHeight                         float64 `json:"back_neck_height"`
@@ -247,7 +251,7 @@ type PhonePosition struct {
 
 type FrontParams struct {
 	SoftValidation struct {
-		Messages string `json:"messages"`
+		Messages json.RawMessage `json:"messages"`
 	} `json:"soft_validation"`
 	BodyAreaPercentage                     float64 `json:"body_area_percentage"`
 	BodyHeight                             float64 `json:"body_height"`
@@ -306,7 +310,7 @@ type FrontParams struct {
 
 type SideParams struct {
 	SoftValidation struct {
-		Messages string `json:"messages"`
+		Messages json.RawMessage `json:"messages"`
 	} `json:"soft_validation"`
 	BodyAreaPercentage      float64 `json:"body_area_percentage"`
 	SideUpperHipLevelToKnee float64 `json:"side_upper_hip_level_to_knee"`
